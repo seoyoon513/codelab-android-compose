@@ -19,15 +19,19 @@ class MainActivity : ComponentActivity() { // activity가 앱의 진입점
         super.onCreate(savedInstanceState)
         setContent { // 레이아웃 정의 (기존 뷰 시스템: XML, 컴포즈: Composable 함수)
             CodelabandroidcomposeTheme { // Composable 함수의 스타일 지정
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    Greeting("Android")
-                }
+                MyApp(modifier = Modifier.fillMaxSize()) // 4-1. 호출부에서 내부 컴포넌트의 수정자를 조정할 수 있기 때문
             }
         }
+    }
+}
+
+@Composable
+fun MyApp(modifier: Modifier = Modifier) { // 4. 기본 수정자가 있는 매개변수를 포함하는 것이 좋다
+    Surface(
+        modifier = modifier,
+        color = MaterialTheme.colorScheme.background
+    ) {
+        Greeting(name = "Android")
     }
 }
 
@@ -48,6 +52,6 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Composable
 fun GreetingPreview() {
     CodelabandroidcomposeTheme {
-        Greeting("Android")
+        MyApp()
     }
 }
