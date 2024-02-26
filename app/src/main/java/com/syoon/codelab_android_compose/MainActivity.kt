@@ -5,8 +5,8 @@ import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -17,8 +17,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.Button
-import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -30,6 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -79,59 +86,67 @@ fun Greetings(
     }
 }
 
-@SuppressLint("UnrememberedMutableState")
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
-    /**
-     * 5. 항목의 상태를 저장하는 값 선언
-     * 5-1. var expanded = false -> 컴포즈에서 상태변경을 감지하지 않음
-     * 5-2. val expanded = mutableStateOf(false) -> 상태 변경을 감지하지만 이전 상태를 기억하지 못함
-     */
-    // 7. Lazy 목록을 스크롤하여 항목이 화면을 벗어날 때 값이 초기화 되는 것을 막아줌
-    var expanded by rememberSaveable { mutableStateOf(false) }
-
-    // 8. 애니메이션 적용
-    val extraPadding by animateDpAsState(
-        targetValue = if (expanded) 48.dp else 0.dp,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow,
-        )
-    )
-
-    // Surface 내부에 중첩된 컴포넌트는 배경 색상 위에 그려짐
-    // 1. androidx.compose.material3.Surface의 경우 Material에 따른 적절한 기본값과 패턴을 적용 (배경색: primary)
-    // 2. Text 컬러를 따로 지정하지 않아도 자동으로 흰색 설정됨 (텍스트: 테마에 정의된 onPrimary)
-    // 3. 수정자를 통해 상위 요소 레이아웃 내에서 UI요소가 배치, 표시, 동작하는 방식을 알림
-    Surface(
-        color = MaterialTheme.colorScheme.primary,
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primary
+        ),
         modifier = modifier.padding(vertical = 4.dp, horizontal = 8.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(24.dp)
-                .background(Color.Blue)
+        CardContent(name = name)
+    }
+}
+
+@SuppressLint("UnrememberedMutableState")
+@Composable
+fun CardContent(name: String, modifier: Modifier = Modifier) {
+    var expanded by rememberSaveable { mutableStateOf(false) }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(24.dp)
+            .background(Color.Blue)
+            .animateContentSize( // animateContentSize 수정자를 row에 적용
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessLow,
+                )
+            )
+    ) {
+        Column(
+            modifier = modifier
+                .weight(1f)
+                .background(Color.Gray)
         ) {
-            Column(
-                modifier = modifier
-                    .weight(1f)
-                    .padding(bottom = extraPadding.coerceAtLeast(0.dp)) // 애니메이션으로 인한 padding 음수값 방지
-                    .background(Color.Gray)
-            ) {
+            Text(
+                text = "Hello",
+                style = MaterialTheme.typography.headlineSmall
+            ) // 9. CodelabandroidcomposeTheme 내 모든 하위 컴포저블에서 Material테마에 정의된 속성을 가져올 수 있다
+            Text(
+                text = name, style = MaterialTheme.typography.headlineMedium.copy(
+                    fontWeight = FontWeight.ExtraBold // 9. copy를 활용하여 미리 정의된 스타일 변경 가능
+                )
+            )
+            if (expanded) {
                 Text(
-                    text = "Hello",
-                    style = MaterialTheme.typography.headlineSmall
-                ) // 9. CodelabandroidcomposeTheme 내 모든 하위 컴포저블에서 Material테마에 정의된 속성을 가져올 수 있다
-                Text(
-                    text = name, style = MaterialTheme.typography.headlineMedium.copy(
-                        fontWeight = FontWeight.ExtraBold // 9. copy를 활용하여 미리 정의된 스타일 변경 가능
-                    )
+                    text = ("Composem ipsum color sit lazy, " +
+                            "padding theme elit, sed do bouncy. ").repeat(4),
                 )
             }
-            ElevatedButton(onClick = { expanded = !expanded }) {
-                Text(text = if (expanded) "Show more" else "Show less")
-            }
+        }
+        IconButton(onClick = { expanded = !expanded }) {
+            Icon(
+                imageVector = if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+                contentDescription = if (expanded) {
+                    stringResource(R.string.show_less)
+                } else {
+                    stringResource(
+                        R.string.show_more
+                    )
+                }
+            )
         }
     }
 }
