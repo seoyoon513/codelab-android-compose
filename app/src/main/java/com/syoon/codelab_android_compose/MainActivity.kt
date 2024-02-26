@@ -1,14 +1,13 @@
 package com.syoon.codelab_android_compose
 
 import android.annotation.SuppressLint
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,12 +25,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.syoon.codelab_android_compose.ui.theme.CodelabandroidcomposeTheme
@@ -120,8 +119,15 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
                     .padding(bottom = extraPadding.coerceAtLeast(0.dp)) // 애니메이션으로 인한 padding 음수값 방지
                     .background(Color.Gray)
             ) {
-                Text(text = "Hello")
-                Text(text = name)
+                Text(
+                    text = "Hello",
+                    style = MaterialTheme.typography.headlineSmall
+                ) // 9. CodelabandroidcomposeTheme 내 모든 하위 컴포저블에서 Material테마에 정의된 속성을 가져올 수 있다
+                Text(
+                    text = name, style = MaterialTheme.typography.headlineMedium.copy(
+                        fontWeight = FontWeight.ExtraBold // 9. copy를 활용하여 미리 정의된 스타일 변경 가능
+                    )
+                )
             }
             ElevatedButton(onClick = { expanded = !expanded }) {
                 Text(text = if (expanded) "Show more" else "Show less")
@@ -150,11 +156,11 @@ fun OnboardingScreen(onContinueClicked: () -> Unit = {}, modifier: Modifier = Mo
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES) // 9. ui모드 속성으로 다크모드 미리보기 설정
 @Composable
 fun GreetingPreview() {
     CodelabandroidcomposeTheme {
-        MyApp()
+        Greetings()
     }
 }
 

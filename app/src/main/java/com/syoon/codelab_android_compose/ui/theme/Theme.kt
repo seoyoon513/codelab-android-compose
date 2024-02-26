@@ -10,21 +10,30 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
+    /*primary = Purple80,
     secondary = PurpleGrey80,
-    tertiary = Pink80
+    tertiary = Pink80*/
+    surface = Blue,
+    onSurface = Navy,
+    primary = Navy,
+    onPrimary = Chartreuse
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
+    /*primary = Purple40,
     secondary = PurpleGrey40,
-    tertiary = Pink40
+    tertiary = Pink40,*/
+    surface = Blue,
+    onSurface = Color.White,
+    primary = LightBlue,
+    onPrimary = Navy
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -38,7 +47,7 @@ private val LightColorScheme = lightColorScheme(
 )
 
 @Composable
-fun CodelabandroidcomposeTheme(
+fun CodelabandroidcomposeTheme( // MaterialTheme를 래핑
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
@@ -62,9 +71,11 @@ fun CodelabandroidcomposeTheme(
         }
     }
 
+    // MaterialTheme
+    // 모든 하위 컴포저블에서 colorScheme, typography, shapes를 가져올 수 있음
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
-        content = content
+        content = content // 스타일 정보가 content 내의 구섣요소로 하향 적용됨
     )
 }
