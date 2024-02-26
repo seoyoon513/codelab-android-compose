@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,7 +48,8 @@ fun MyApp(
     modifier: Modifier = Modifier, // 4. 기본 수정자가 있는 매개변수를 포함하는 것이 좋다
 ) {
     // 6. 상태 호이스팅
-    var shouldShowOnBoarding by remember { mutableStateOf(true) } // by로 get,set 위임
+    // 7. rememberSaveable은 구성변경(ex.화면회전) 및 프로세스 중단에도 상태를 저장함
+    var shouldShowOnBoarding by rememberSaveable { mutableStateOf(true) } // by로 get,set 위임
 
     Surface(modifier = modifier) {
         if (shouldShowOnBoarding) {
@@ -82,7 +84,8 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
      * 5-1. var expanded = false -> 컴포즈에서 상태변경을 감지하지 않음
      * 5-2. val expanded = mutableStateOf(false) -> 상태 변경을 감지하지만 이전 상태를 기억하지 못함
      */
-    var expanded by remember { mutableStateOf(false) }
+    // 7. Lazy 목록을 스크롤하여 항목이 화면을 벗어날 때 값이 초기화 되는 것을 막아줌
+    var expanded by rememberSaveable { mutableStateOf(false) }
     val extraPadding = if (expanded) 48.dp else 0.dp
     // Surface 내부에 중첩된 컴포넌트는 배경 색상 위에 그려짐
     // 1. androidx.compose.material3.Surface의 경우 Material에 따른 적절한 기본값과 패턴을 적용 (배경색: primary)
