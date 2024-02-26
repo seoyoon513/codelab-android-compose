@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,8 +18,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,6 +43,26 @@ class MainActivity : ComponentActivity() { // activity가 앱의 진입점
 @Composable
 fun MyApp(
     modifier: Modifier = Modifier, // 4. 기본 수정자가 있는 매개변수를 포함하는 것이 좋다
+) {
+    // 6. 상태 호이스팅
+    var shouldShowOnBoarding by remember { mutableStateOf(true) } // by로 get,set 위임
+
+    Surface(modifier = modifier) {
+        if (shouldShowOnBoarding) {
+            OnboardingScreen(
+                // shouldShowOnBoarding 상태가 아닌 함수 콜백 전달
+                onContinueClicked = { shouldShowOnBoarding = false }
+            )
+        } else {
+            Greetings()
+        }
+
+    }
+}
+
+@Composable
+fun Greetings(
+    modifier: Modifier = Modifier,
     names: List<String> = listOf("World", "Compose")
 ) {
     Column(modifier = modifier.padding(vertical = 4.dp)) {
@@ -56,8 +80,8 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
      * 5-1. var expanded = false -> 컴포즈에서 상태변경을 감지하지 않음
      * 5-2. val expanded = mutableStateOf(false) -> 상태 변경을 감지하지만 이전 상태를 기억하지 못함
      */
-    val expanded = remember { mutableStateOf(false) }
-    val extraPadding = if (expanded.value) 48.dp else 0.dp
+    var expanded by remember { mutableStateOf(false) }
+    val extraPadding = if (expanded) 48.dp else 0.dp
     // Surface 내부에 중첩된 컴포넌트는 배경 색상 위에 그려짐
     // 1. androidx.compose.material3.Surface의 경우 Material에 따른 적절한 기본값과 패턴을 적용 (배경색: primary)
     // 2. Text 컬러를 따로 지정하지 않아도 자동으로 흰색 설정됨 (텍스트: 테마에 정의된 onPrimary)
@@ -66,22 +90,44 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
         color = MaterialTheme.colorScheme.primary,
         modifier = modifier.padding(vertical = 4.dp, horizontal = 8.dp)
     ) {
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .padding(24.dp)
-            .background(Color.Blue)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp)
+                .background(Color.Blue)
         ) {
-            Column(modifier = modifier
-                .weight(1f)
-                .padding(bottom = extraPadding)
-                .background(Color.Gray)
+            Column(
+                modifier = modifier
+                    .weight(1f)
+                    .padding(bottom = extraPadding)
+                    .background(Color.Gray)
             ) {
                 Text(text = "Hello")
                 Text(text = name)
             }
-            ElevatedButton(onClick = { expanded.value = !expanded.value}) {
-                Text(text = if (expanded.value) "Show more" else "Show less")
+            ElevatedButton(onClick = { expanded = !expanded }) {
+                Text(text = if (expanded) "Show more" else "Show less")
             }
+        }
+    }
+}
+
+@Composable
+fun OnboardingScreen(onContinueClicked: () -> Unit = {}, modifier: Modifier = Modifier) {
+    // 6. 상태값을 상위 요소로 끌어올림 -> MyApp()
+    // var shouldShowOnBoarding by remember { mutableStateOf(true) }
+
+    Column(
+        modifier = modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = "welcome to the Basics Codelab!")
+        Button(
+            modifier = Modifier.padding(24.dp),
+            onClick = onContinueClicked
+        ) {
+            Text(text = "Continue")
         }
     }
 }
@@ -91,5 +137,13 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 fun GreetingPreview() {
     CodelabandroidcomposeTheme {
         MyApp()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun OnboardingPreview() {
+    CodelabandroidcomposeTheme {
+        OnboardingScreen()
     }
 }
