@@ -1,6 +1,8 @@
 package com.syoon.codelab_android_compose
 
+import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -15,6 +17,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -44,8 +48,16 @@ fun MyApp(
     }
 }
 
+@SuppressLint("UnrememberedMutableState")
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
+    /**
+     * 5. 항목의 상태를 저장하는 값 선언
+     * 5-1. var expanded = false -> 컴포즈에서 상태변경을 감지하지 않음
+     * 5-2. val expanded = mutableStateOf(false) -> 상태 변경을 감지하지만 이전 상태를 기억하지 못함
+     */
+    val expanded = remember { mutableStateOf(false) }
+    val extraPadding = if (expanded.value) 48.dp else 0.dp
     // Surface 내부에 중첩된 컴포넌트는 배경 색상 위에 그려짐
     // 1. androidx.compose.material3.Surface의 경우 Material에 따른 적절한 기본값과 패턴을 적용 (배경색: primary)
     // 2. Text 컬러를 따로 지정하지 않아도 자동으로 흰색 설정됨 (텍스트: 테마에 정의된 onPrimary)
@@ -61,13 +73,14 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
         ) {
             Column(modifier = modifier
                 .weight(1f)
+                .padding(bottom = extraPadding)
                 .background(Color.Gray)
             ) {
                 Text(text = "Hello")
                 Text(text = name)
             }
-            ElevatedButton(onClick = { }) {
-                Text(text = "Show mord")
+            ElevatedButton(onClick = { expanded.value = !expanded.value}) {
+                Text(text = if (expanded.value) "Show more" else "Show less")
             }
         }
     }
